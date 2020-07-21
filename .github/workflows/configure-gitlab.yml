@@ -18,7 +18,7 @@ jobs:
         run: |
           cat <<EOT >> git-ssh.sh
           #!/bin/sh
-          exec /usr/bin/ssh -i ~/.ssh/id_rsa "$@"
+          exec /usr/bin/ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$@"
           EOT
           chmod +x git-ssh.sh
           GIT_SSH=./git-ssh.sh
