@@ -14,8 +14,9 @@ jobs:
       - name: Pull repo
         env: 
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
-          git pull ${{ secrets.GITLAB_REPO }}
+          git pull "$GITLAB_REPO"
       - name: show stuff
         run: |
           ls .
