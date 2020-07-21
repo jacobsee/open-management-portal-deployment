@@ -17,9 +17,8 @@ jobs:
           GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
           git version
-          # export GIT_SSH_COMMAND="ssh -v -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no"
-          # does this even do anything
-          SSH_AUTH_SOCK=$SSH_AUTH_SOCK git clone "$GITLAB_REPO"
+          export GIT_SSH_COMMAND="SSH_AUTH_SOCK=$SSH_AUTH_SOCK ssh"
+          git clone "$GITLAB_REPO"
       - name: show stuff
         run: |
           ls .
