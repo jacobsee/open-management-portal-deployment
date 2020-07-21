@@ -1,3 +1,6 @@
+on:
+  push
+
 jobs:
   stuff:
     runs-on: ubuntu-18.04
