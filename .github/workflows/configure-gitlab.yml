@@ -14,6 +14,7 @@ jobs:
         env: 
           GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
+          GIT_SSH_COMMAND="ssh -v -i ~/.ssh/id_rsa"
           git clone "$GITLAB_REPO"
       - name: show stuff
         run: |
