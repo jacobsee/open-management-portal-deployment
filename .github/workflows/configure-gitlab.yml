@@ -9,11 +9,9 @@ jobs:
         uses: jacobsee/github-actions/configure-ssh-auth-sock@ssh-setup-action
         with:
           domain: ${{ secrets.GITLAB_DOMAIN}}
-          ssh_auth_sock: ./ssh_agent.sock
           private_key: ${{ secrets.GITLAB_PRIVATE_KEY }}
       - name: Clone repo
         env: 
-          SSH_AUTH_SOCK: ./ssh_agent.sock
           GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
           git clone "$GITLAB_REPO"
