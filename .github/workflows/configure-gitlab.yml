@@ -17,12 +17,7 @@ jobs:
           GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
           git version
-          cat <<EOT >> git-ssh.sh
-          #!/bin/sh
-          exec /usr/bin/ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$@"
-          EOT
-          chmod +x git-ssh.sh
-          GIT_SSH=./git-ssh.sh
+          export GIT_SSH_COMMAND="ssh -v -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no"
           git clone "$GITLAB_REPO"
       - name: show stuff
         run: |
