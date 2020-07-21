@@ -1,20 +1,18 @@
 jobs:
   stuff:
     runs-on: ubuntu-18.04
-    container: bitnami/git
     steps:
-      - name: Configure SSH
+      - name: Set up SSH
+        uses: jacobsee/github-actions/configure-ssh-auth-sock@ssh-setup-action
+        with:
+          domain: ${{ secrets.GITLAB_DOMAIN}}
+          ssh_auth_sock: /tmp/ssh_agent.sock
+          private_key: ${{ secrets.GITLAB_PRIVATE_KEY }}
+      - name: Pull repo
         env: 
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          mkdir -p ~/.ssh
-          echo "Updating known_hosts."
-          ssh-keyscan gitlab.consulting.redhat.com >> ~/.ssh/known_hosts
-          echo "Updated known_hosts!"
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          echo "Adding private key"
-          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-          echo "Added private key!"
+          git pull ${{ secrets.GITLAB_REPO }}
       - name: show stuff
         run: |
           ls .
