@@ -11,7 +11,6 @@ jobs:
           domain: ${{ secrets.GITLAB_DOMAIN}}
           private_key: ${{ secrets.GITLAB_PRIVATE_KEY }}
           ssh_port: 2222
-          ssh_auth_sock: ./ssh_agent.sock
       # - name: please work
       #   uses: webfactory/ssh-agent@v0.4.0
       #   with:
