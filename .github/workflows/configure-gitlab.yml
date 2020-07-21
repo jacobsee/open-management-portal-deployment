@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir -p $HOME/.ssh
           ssh-keyscan -p 2222 ${{ secrets.GITLAB_DOMAIN }} >> $HOME/.ssh/known_hosts
-          git clone $GITLAB_REPO
+          git clone ${{ secrets.GITLAB_REPO }}
       # - name: Clone repo
       #   env: 
       #     GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
