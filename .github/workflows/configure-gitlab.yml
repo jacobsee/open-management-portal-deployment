@@ -16,6 +16,7 @@ jobs:
         env: 
           GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
+          git version
           cat <<EOT >> git-ssh.sh
           #!/bin/sh
           exec /usr/bin/ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$@"
