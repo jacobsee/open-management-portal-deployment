@@ -12,13 +12,14 @@ jobs:
           private_key: ${{ secrets.GITLAB_PRIVATE_KEY }}
           ssh_port: 2222
           ssh_auth_sock: ./ssh_agent.sock
-      - name: Clone repo
-        env: 
-          GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
-        run: |
-          git version
-          export GIT_SSH_COMMAND="SSH_AUTH_SOCK=$SSH_AUTH_SOCK ssh -o StrictHostKeyChecking=no"
-          git clone "$GITLAB_REPO"
+          git_repo: ${{ secrets.GITLAB_REPO }}
+      # - name: Clone repo
+      #   env: 
+      #     GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
+      #   run: |
+      #     git version
+      #     export GIT_SSH_COMMAND="SSH_AUTH_SOCK=$SSH_AUTH_SOCK ssh -o StrictHostKeyChecking=no"
+      #     git clone "$GITLAB_REPO"
       - name: show stuff
         run: |
           ls .
