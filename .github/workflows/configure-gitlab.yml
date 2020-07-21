@@ -11,12 +11,12 @@ jobs:
           domain: ${{ secrets.GITLAB_DOMAIN}}
           ssh_auth_sock: /tmp/ssh_agent.sock
           private_key: ${{ secrets.GITLAB_PRIVATE_KEY }}
-      - name: Pull repo
+      - name: Clone repo
         env: 
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
-          git pull "$GITLAB_REPO"
+          git clone "$GITLAB_REPO"
       - name: show stuff
         run: |
           ls .
