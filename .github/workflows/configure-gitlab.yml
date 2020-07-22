@@ -11,21 +11,10 @@ jobs:
           domain: ${{ secrets.GITLAB_DOMAIN}}
           private_key: ${{ secrets.GITLAB_PRIVATE_KEY }}
           ssh_port: 2222
-      # - name: please work
-      #   uses: webfactory/ssh-agent@v0.4.0
-      #   with:
-      #     ssh-private-key: ${{ secrets.GITLAB_PRIVATE_KEY }}
-      # - name: please work 2
-      #   run: |
-      #     mkdir -p $HOME/.ssh
-      #     ssh-keyscan -p 2222 ${{ secrets.GITLAB_DOMAIN }} >> $HOME/.ssh/known_hosts
-      #     git clone ${{ secrets.GITLAB_REPO }}
       - name: Clone repo
         env: 
           GITLAB_REPO: ${{ secrets.GITLAB_REPO }}
         run: |
-          git version
-          # export GIT_SSH_COMMAND="SSH_AUTH_SOCK=$SSH_AUTH_SOCK ssh -o StrictHostKeyChecking=no"
           git clone "$GITLAB_REPO"
       - name: show stuff
         run: |
