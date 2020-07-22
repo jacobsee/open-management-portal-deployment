@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - name: Set up SSH
-        uses: jacobsee/github-actions/configure-ssh-auth-sock@ssh-setup-action
+        uses: jacobsee/github-actions/ssh-agent@ssh-agent-action
         with:
           domain: ${{ secrets.GITLAB_DOMAIN}}
           private_key: ${{ secrets.GITLAB_PRIVATE_KEY }}
