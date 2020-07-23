@@ -35,7 +35,7 @@ jobs:
           github.issues.getLabel({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            name: "${{ steps.env_info.outputs.issuetitle }}"
+            name: ${{ steps.env_info.outputs.issuetitle }}
           })
     - name: Create label to be used for release
       uses: actions/github-script@v1
@@ -46,7 +46,7 @@ jobs:
           github.issues.createLabel({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            name: "${{ steps.env_info.outputs.issuetitle }}",
+            name: ${{ steps.env_info.outputs.issuetitle }},
             color: "2d5893"
           })
       if: ${{ steps.label_check.outcome == 'failure' }}
