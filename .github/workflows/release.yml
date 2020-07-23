@@ -5,7 +5,6 @@ on:
     types: [release-command]
 jobs:
   create-release-branch:
-    if: ${{ .client_payload.github.payload.issue.title }}
     runs-on: ubuntu-latest
     steps:
     - name: Get Environment Info
@@ -19,11 +18,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        branch: ${{ .client_payload.github.payload.issue.title }}
+        branch: ${{ steps.env_info.outputs.issuetitle }}
       if: ${{ steps.env_info.outputs.release == null }}
     - name: Alert that release already exists
       run: |
-        echo "Release branch ${{ .client_payload.github.payload.issue.title }} already exists. Skipping..."
+        echo "Release branch ${{ steps.env_info.outputs.issuetitle }} already exists. Skipping..."
       if: ${{ steps.env_info.outputs.release != null }}
     - name: Check if label exists
       uses: actions/github-script@v1
@@ -35,7 +34,7 @@ jobs:
           github.issues.getLabel({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            name: "${{ .client_payload.github.payload.issue.title }}"
+            name: "${{ steps.env_info.outputs.issuetitle }}"
           })
     - name: Create label to be used for release
       uses: actions/github-script@v1
@@ -46,7 +45,7 @@ jobs:
           github.issues.createLabel({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            name: "${{ .client_payload.github.payload.issue.title }}",
+            name: "${{ steps.env_info.outputs.issuetitle }}",
             color: "2d5893"
           })
       if: ${{ steps.label_check.outcome == 'failure' }}
@@ -60,7 +59,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: ${{steps.env_info.outputs.issuenm}},
-            labels: ["${{.client_payload.github.payload.issue.title }}"]
+            labels: ["${{ steps.env_info.outputs.issuetitle }}"]
           })
 
   update-release-pointers:
@@ -73,7 +72,7 @@ jobs:
         echo ::set-output name=comment_url::$(jq .client_payload.github.payload.comment.html_url $GITHUB_EVENT_PATH)
     - uses: actions/checkout@v2
       with:
-        ref: ${{ .client_payload.github.payload.issue.title }}
+        ref: ${{ steps.env_info.outputs.issuetitle }}
     - name: Update Frontend Release
       if: ${{ github.event.client_payload.slash_command.frontend != null }}
       uses: mikefarah/yq@3.3.2
@@ -113,11 +112,11 @@ jobs:
       uses: redhat-cop/github-actions/set-helm-version@master
       with:
         path: applications
-        chart_version: ${{ .client_payload.github.payload.issue.title }}
-        app_version: ${{ .client_payload.github.payload.issue.title }}
+        chart_version: ${{ steps.env_info.outputs.issuetitle }}
+        app_version: ${{ steps.env_info.outputs.issuetitle }}
     - name: Commit changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        branch: ${{ .client_payload.github.payload.issue.title }}
+        branch: ${{ steps.env_info.outputs.issuetitle }}
         commit_message: "Merging changes requested from ${{ steps.env_info.outputs.comment_url }}"
 
