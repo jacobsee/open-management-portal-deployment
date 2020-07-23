@@ -60,7 +60,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: ${{steps.env_info.outputs.issuenm}},
-            labels: ["${{ steps.env_info.outputs.issuetitle }}"]
+            labels: [${{ steps.env_info.outputs.issuetitle }}]
           })
 
   update-release-pointers:
