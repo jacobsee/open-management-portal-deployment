@@ -10,9 +10,10 @@ jobs:
     - name: Get Environment Info
       id: env_info
       run: |
-        echo ::set-output name=release::$(git ls-remote --heads https://github.com/$GITHUB_REPOSITORY ${{ .client_payload.github.payload.issue.title }})
+        ISSUE_TITLE=$(jq .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
+        echo ::set-output name=release::$(git ls-remote --heads https://github.com/$GITHUB_REPOSITORY $ISSUE_TITLE)
         echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
-        echo ::set-output name=issuetitle::$(jq .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
+        echo ::set-output name=issuetitle::$ISSUE_TITLE
     - name: Create release branch
       uses: peterjgrainger/action-create-branch@v1.0.0
       env:
