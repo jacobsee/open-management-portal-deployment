@@ -14,3 +14,13 @@ jobs:
         token: ${{ secrets.ACTIONS_TOKEN }}
         commands: release, release-rc, promote
         named-args: true
+    - name: Create comment
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        token: ${{ secrets.ACTIONS_TOKEN }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
+        body: |
+          [Command run output][1]
+
+          [1]: ${{ steps.vars.outputs.run-url }}
