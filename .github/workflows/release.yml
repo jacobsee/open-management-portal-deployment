@@ -73,7 +73,7 @@ jobs:
         echo ::set-output name=comment_url::$(jq .client_payload.github.payload.comment.html_url $GITHUB_EVENT_PATH)
     - uses: actions/checkout@v2
       with:
-        ref: ${{ steps.env_info.outputs.issuetitle }}
+        ref: $(jq .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
     - name: Update Frontend Release
       if: ${{ github.event.client_payload.slash_command.frontend != null }}
       uses: mikefarah/yq@3.3.2
@@ -113,18 +113,18 @@ jobs:
       uses: redhat-cop/github-actions/set-helm-version@master
       with:
         path: applications
-        chart_version: ${{ steps.env_info.outputs.issuetitle }}
-        app_version: ${{ steps.env_info.outputs.issuetitle }}
+        chart_version: $(jq .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
+        app_version: $(jq .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
     - name: Commit changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        branch: ${{ steps.env_info.outputs.issuetitle }}
+        branch: $(jq .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
         commit_message: "Merging changes requested from ${{ steps.env_info.outputs.comment_url }}"
     - name: Create comment
       uses: peter-evans/create-or-update-comment@v1
       with:
         token: ${{ secrets.ACTIONS_TOKEN }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        issue-number: ${{ steps.env_info.outputs.issuenm }}
+        issue-number: $(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
         body: |
-          Created release ${{ steps.env_info.outputs.issuetitle }}!
+          Created release $(jq .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)!
