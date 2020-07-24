@@ -71,6 +71,7 @@ jobs:
       id: env_info
       run: |
         echo ::set-output name=issuetitle::$(jq -r .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
+        echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
         echo ::set-output name=comment_url::$(jq .client_payload.github.payload.comment.html_url $GITHUB_EVENT_PATH)
     - uses: actions/checkout@v2
       with:
@@ -126,6 +127,6 @@ jobs:
       with:
         token: ${{ secrets.ACTIONS_TOKEN }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        issue-number: "${{ steps.env_info.outputs.issuetitle }}"
+        issue-number: "${{ steps.env_info.outputs.issuenm }}"
         body: |
           Created release ${{ steps.env_info.outputs.issuetitle }}!
