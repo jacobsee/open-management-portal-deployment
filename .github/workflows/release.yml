@@ -19,7 +19,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        branch: ${{ steps.env_info.outputs.issuetitle }}
+        branch: "${{ steps.env_info.outputs.issuetitle }}"
       if: ${{ steps.env_info.outputs.release == null }}
     - name: Alert that release already exists
       run: |
@@ -35,7 +35,7 @@ jobs:
           github.issues.getLabel({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            name: ${{ steps.env_info.outputs.issuetitle }}
+            name: "${{ steps.env_info.outputs.issuetitle }}"
           })
     - name: Create label to be used for release
       uses: actions/github-script@v1
@@ -46,7 +46,7 @@ jobs:
           github.issues.createLabel({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            name: ${{ steps.env_info.outputs.issuetitle }},
+            name: "${{ steps.env_info.outputs.issuetitle }}",
             color: "2d5893"
           })
       if: ${{ steps.label_check.outcome == 'failure' }}
@@ -60,7 +60,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: ${{steps.env_info.outputs.issuenm}},
-            labels: [${{ steps.env_info.outputs.issuetitle }}]
+            labels: ["${{ steps.env_info.outputs.issuetitle }}"]
           })
 
   update-release-pointers:
@@ -70,7 +70,7 @@ jobs:
     - name: Get Environment Info
       id: env_info
       run: |
-        echo ::set-output name=issuetitle::$(jq -r .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
+        echo ::set-output name=issuetitle::$(jq -r .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
         echo ::set-output name=comment_url::$(jq .client_payload.github.payload.comment.html_url $GITHUB_EVENT_PATH)
     - uses: actions/checkout@v2
       with:
@@ -114,18 +114,18 @@ jobs:
       uses: redhat-cop/github-actions/set-helm-version@master
       with:
         path: applications
-        chart_version: ${{ steps.env_info.outputs.comment_url }}
-        app_version: ${{ steps.env_info.outputs.comment_url }}
+        chart_version: "${{ steps.env_info.outputs.issuetitle }}"
+        app_version: "${{ steps.env_info.outputs.issuetitle }}"
     - name: Commit changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        branch: ${{ steps.env_info.outputs.comment_url }}
+        branch: "${{ steps.env_info.outputs.issuetitle }}"
         commit_message: "Merging changes requested from ${{ steps.env_info.outputs.comment_url }}"
     - name: Create comment
       uses: peter-evans/create-or-update-comment@v1
       with:
         token: ${{ secrets.ACTIONS_TOKEN }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        issue-number: ${{ steps.env_info.outputs.comment_url }}
+        issue-number: "${{ steps.env_info.outputs.issuetitle }}"
         body: |
-          Created release ${{ steps.env_info.outputs.comment_url }}!
+          Created release ${{ steps.env_info.outputs.issuetitle }}!
