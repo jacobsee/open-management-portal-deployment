@@ -74,7 +74,7 @@ jobs:
         echo ::set-output name=comment_url::$(jq .client_payload.github.payload.comment.html_url $GITHUB_EVENT_PATH)
     - uses: actions/checkout@v2
       with:
-        ref: ${{ steps.env_info.outputs.comment_url }}
+        ref: ${{ steps.env_info.outputs.issuetitle }}
     - name: Update Frontend Release
       if: ${{ github.event.client_payload.slash_command.frontend != null }}
       uses: mikefarah/yq@3.3.2
