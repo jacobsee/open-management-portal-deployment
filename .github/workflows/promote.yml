@@ -54,4 +54,16 @@ jobs:
             pull_number: ${{ steps.pr_num.outputs.prnm}},
             merge_method: "squash"
           })
+    - name: Apply label to issue
+      uses: actions/github-script@v1
+      if: ${{ steps.create_label.outcome == 'success' }}
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.addLabels({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: ${{steps.env_info.outputs.issuenm}},
+            labels: ["promoted to ${{ steps.env_info.outputs.newenv }}"]
+          })
 
