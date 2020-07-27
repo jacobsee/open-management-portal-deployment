@@ -125,7 +125,6 @@ jobs:
     - name: Create comment
       uses: peter-evans/create-or-update-comment@v1
       with:
-        token: ${{ secrets.ACTIONS_TOKEN }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         issue-number: "${{ steps.env_info.outputs.issuenm }}"
         body: |
