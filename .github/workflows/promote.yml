@@ -1,0 +1,69 @@
+name: Promote Dispatch
+
+on:
+  repository_dispatch:
+    types: [promote-command]
+jobs:
+  promote-release:
+    # if: ${{ github.event.client_payload.slash_command.env }} && ${{ github.event.client_payload.slash_command.name }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set Env Variables
+      id: env_info
+      run: |
+        echo ::set-output name=issuetitle::$(jq -r .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
+        echo ::set-output name=newenv::integration
+        echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
+        echo ::set-output name=requestor::$(jq .client_payload.github.actor $GITHUB_EVENT_PATH)
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ steps.env_info.outputs.issuetitle }}
+    - name: GitHub Pull Request Action
+      id: create_pr
+      uses: repo-sync/pull-request@v2.2
+      with:
+        source_branch: ${{ steps.env_info.outputs.issuetitle }}
+        destination_branch: ${{ steps.env_info.outputs.newenv }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        pr_title: "Promoting ${{ steps.env_info.outputs.issuetitle }} to ${{ steps.env_info.outputs.newenv }}"
+        pr_body: "Promoting release ${{ steps.env_info.outputs.issuetitle }} to the ${{ steps.env_info.outputs.newenv }} environment as requested by @${{ steps.env_info.outputs.requestor }}."
+    - name: Get PR number
+      id: pr_num
+      run: |
+        echo ::set-output name=prnm::$( echo ${{ steps.create_pr.outputs.pr_url }} | awk -F'/' '{print $NF}')
+    - name: Apply label to issue
+      uses: actions/github-script@v2
+      if: ${{ steps.create_pr.outcome == 'success' }}
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.addLabels({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: ${{steps.pr_num.outputs.prnm}},
+            labels: ["${{ steps.env_info.outputs.issuetitle }}"]
+          })
+    - name: Auto-merge
+      uses: actions/github-script@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.pulls.merge({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: ${{ steps.pr_num.outputs.prnm}},
+            merge_method: "squash"
+          })
+    - name: Apply label to issue
+      uses: actions/github-script@v1
+      if: ${{ steps.create_label.outcome == 'success' }}
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.addLabels({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: ${{steps.env_info.outputs.issuenm}},
+            labels: ["promoted to ${{ steps.env_info.outputs.newenv }}"]
+          })
+
