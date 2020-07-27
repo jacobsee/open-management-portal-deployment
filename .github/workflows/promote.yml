@@ -12,9 +12,18 @@ jobs:
       id: env_info
       run: |
         echo ::set-output name=issuetitle::$(jq -r .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
-        echo ::set-output name=newenv::integration
         echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
         echo ::set-output name=requestor::$(jq .client_payload.github.actor $GITHUB_EVENT_PATH)
+    - name: Set New Env (Integration)
+      id: new_env
+      if: ${{ !contains(github.event.pull_request.labels.*.name, 'deployed to integration') }}
+      run: |
+        echo ::set-output name=newenv::integration
+    - name: Set New Env
+      id: new_env
+      if: ${{ contains(github.event.pull_request.labels.*.name, 'deployed to integration') }}
+      run: |
+        echo ::set-output name=newenv::production
     - uses: actions/checkout@v2
       with:
         ref: ${{ steps.env_info.outputs.issuetitle }}
