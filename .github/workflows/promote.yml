@@ -15,15 +15,13 @@ jobs:
         echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
         echo ::set-output name=requestor::$(jq .client_payload.github.actor $GITHUB_EVENT_PATH)
     - name: Set New Env (Integration)
-      id: new_env
-      if: ${{ !contains(github.event.pull_request.labels.*.name, 'deployed to integration') }}
+      if: ${{ !contains(github.event.issue.labels.*.name, 'deployed to integration') }}
       run: |
-        echo ::set-output name=newenv::integration
-    - name: Set New Env
-      id: new_env
-      if: ${{ contains(github.event.pull_request.labels.*.name, 'deployed to integration') }}
+        echo ::set-env name=NEW_ENV::integration
+    - name: Set New Env (Production)
+      if: ${{ contains(github.event.issue.labels.*.name, 'deployed to integration') }}
       run: |
-        echo ::set-output name=newenv::production
+        echo ::set-env name=NEW_ENG::production
     - uses: actions/checkout@v2
       with:
         ref: ${{ steps.env_info.outputs.issuetitle }}
@@ -32,10 +30,10 @@ jobs:
       uses: repo-sync/pull-request@v2.2
       with:
         source_branch: ${{ steps.env_info.outputs.issuetitle }}
-        destination_branch: ${{ steps.env_info.outputs.newenv }}
+        destination_branch: ${{ NEW_ENV }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        pr_title: "Promoting ${{ steps.env_info.outputs.issuetitle }} to ${{ steps.env_info.outputs.newenv }}"
-        pr_body: "Promoting release ${{ steps.env_info.outputs.issuetitle }} to the ${{ steps.env_info.outputs.newenv }} environment as requested by @${{ steps.env_info.outputs.requestor }}."
+        pr_title: "Promoting ${{ steps.env_info.outputs.issuetitle }} to ${{ NEW_ENV }}"
+        pr_body: "Promoting release ${{ steps.env_info.outputs.issuetitle }} to the ${{ NEW_ENV }} environment as requested by @${{ steps.env_info.outputs.requestor }}."
     - name: Get PR number
       id: pr_num
       run: |
@@ -73,6 +71,6 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: ${{steps.env_info.outputs.issuenm}},
-            labels: ["promoted to ${{ steps.env_info.outputs.newenv }}"]
+            labels: ["promoted to ${{ NEW_ENV }}"]
           })
 
