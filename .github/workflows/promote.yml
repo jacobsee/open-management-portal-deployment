@@ -5,13 +5,11 @@ on:
     types: [promote-command]
 jobs:
   promote-release:
-    # if: ${{ github.event.client_payload.slash_command.env }} && ${{ github.event.client_payload.slash_command.name }}
     runs-on: ubuntu-latest
     steps:
     - name: Set Env Variables
       id: env_info
       run: |
-        echo "debug $(jq .client_payload.github.payload.issue.labels $GITHUB_EVENT_PATH)"
         echo ::set-output name=issuetitle::$(jq -r .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
         echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
         echo ::set-output name=labels::$(jq .client_payload.github.payload.issue.labels $GITHUB_EVENT_PATH)
@@ -75,4 +73,11 @@ jobs:
             issue_number: ${{steps.env_info.outputs.issuenm}},
             labels: ["promoted to ${{ env.NEW_ENV }}"]
           })
-
+    - name: Create comment
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        token: ${{ secrets.ACTIONS_TOKEN }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        issue-number: "${{ steps.env_info.outputs.issuenm }}"
+        body: |
+          Promoted release ${{ steps.env_info.outputs.issuetitle }} to ${{ env.NEW_ENV }}!
