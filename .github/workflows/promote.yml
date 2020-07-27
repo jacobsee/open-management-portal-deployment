@@ -11,15 +11,17 @@ jobs:
     - name: Set Env Variables
       id: env_info
       run: |
+        echo "debug $(jq .client_payload.github.payload.issue.labels $GITHUB_EVENT_PATH)"
         echo ::set-output name=issuetitle::$(jq -r .client_payload.github.payload.issue.title $GITHUB_EVENT_PATH)
         echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
+        echo ::set-output name=labels::$(jq .client_payload.github.payload.issue.labels $GITHUB_EVENT_PATH)
         echo ::set-output name=requestor::$(jq .client_payload.github.actor $GITHUB_EVENT_PATH)
     - name: Set New Env (Integration)
-      if: ${{ !contains(github.event.issue.labels.*.name, 'promoted to integration') }}
+      if: ${{ !contains(steps.env_info.outputs.labels, 'promoted to integration') }}
       run: |
         echo ::set-env name=NEW_ENV::integration
     - name: Set New Env (Production)
-      if: ${{ contains(github.event.issue.labels.*.name, 'promoted to integration') }}
+      if: ${{ contains(steps.env_info.outputs.labels, 'promoted to integration') }}
       run: |
         echo ::set-env name=NEW_ENV::production
     - uses: actions/checkout@v2
