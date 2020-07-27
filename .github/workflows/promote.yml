@@ -15,11 +15,11 @@ jobs:
         echo ::set-output name=issuenm::$(jq .client_payload.github.payload.issue.number $GITHUB_EVENT_PATH)
         echo ::set-output name=requestor::$(jq .client_payload.github.actor $GITHUB_EVENT_PATH)
     - name: Set New Env (Integration)
-      if: ${{ !contains(github.event.issue.labels.*.name, 'deployed to integration') }}
+      if: ${{ !contains(github.event.issue.labels.*.name, 'promoted to integration') }}
       run: |
         echo ::set-env name=NEW_ENV::integration
     - name: Set New Env (Production)
-      if: ${{ contains(github.event.issue.labels.*.name, 'deployed to integration') }}
+      if: ${{ contains(github.event.issue.labels.*.name, 'promoted to integration') }}
       run: |
         echo ::set-env name=NEW_ENV::production
     - uses: actions/checkout@v2
