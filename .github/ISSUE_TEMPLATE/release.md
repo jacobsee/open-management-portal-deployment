@@ -1,4 +1,11 @@
-# Creating a LodeStar Release
+---
+name: Creating a LodeStar Release
+about: A template to use for releasing
+title: v1.0.0
+labels: ''
+assignees: ''
+
+---
 
 This repository contains GitHub workflows for managing releases automatically.
 
