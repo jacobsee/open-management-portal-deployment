@@ -124,9 +124,7 @@ jobs:
         commit_message: "Merging changes requested from ${{ steps.env_info.outputs.comment_url }}"
     - name: 'Get Previous tag'
       id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@master"
-      env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      uses: actions-ecosystem/action-get-latest-tag@v1
     - name: Generate Release Body
       id: release_body
       run: |
